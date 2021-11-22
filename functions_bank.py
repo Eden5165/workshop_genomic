@@ -1,8 +1,20 @@
 # Data preperation
 
+
+def get_df(table_name, sep='\t', lineterminator='\n'):
+    """
+    param table_name: in ["beat_drug", "beat_rnaseq", "drug_mut_cor", "drug_mut_cor_lables", "tcga_mut", "tcga_ma"]
+    param sep: Columns seperator characters. Optional, default='\t'
+    param lineterminator: Rows seperator characters. Optional, default='\n'
+    return: df for the requested table
+    """
+    pass
+
+
 def transpose_df(df):
     """
-    param: 
+    param df: df in wich columns are samples
+    return: trsanposed df such that first column named SampleID, rows are samples
     """
     pass
 
