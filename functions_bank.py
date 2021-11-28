@@ -18,7 +18,13 @@ def transpose_df(df):
     """
     pass
 
-def fit_drugs_to_genes(genes_df, drugs_df):
+def get_data_reorgenized(genes_df, other_data_df):
+    """
+    param genes_df: genes df such that rows are samples
+    param other_data_df: drugs or mutations df such that rows are sample
+    return: other_data_df reoregenized such that row i represents the sample i that is
+    represented by row i in genes_df
+    """
     pass
 
 
