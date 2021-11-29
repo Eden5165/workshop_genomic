@@ -43,11 +43,14 @@ That means, genes_df and drugs_df are the results of transpose_df and fit_drugs_
 
 
 # Normalization
-def sum_gene_exp_to_one(df):
-    pass
-
-
-def sum_gene_exp_to_mil(dg):
+def sum_gene_exp_to_num(genes_df, num):
+    """
+    param genes_df: genes df such that rows are samples and first colum is the sample ID
+    param num: 1 or 1000000.
+    return: if num=1, returns genes_df_sum such that each cell is divided by the sum of it's column, that
+    means, each column (gene) is summed to one. if num = 1 mill, same as 1 only multiplied by 1 mill, 
+    That menas, each column (gene) is summed to one mill.
+    """
     pass
 
 
