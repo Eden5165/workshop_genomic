@@ -1,4 +1,10 @@
 # Data preperation
+def filter_beat_by_tcga(beat_rna, tcga_rna):
+    """
+    param beat_rna tcga_rna: original data frames such that rows are genes
+    return beat_rna_filtered: beat_rna df only with genes that appear in tcga_rna
+    """
+    pass
 
 
 def get_df(table_name, sep='\t', lineterminator='\n'):
@@ -141,6 +147,12 @@ def predict_unlabeled(model1, unlabeled_df):
 
 
 def predict_unlabeled_coreg(model1, unlabeled_df):
+    pass
+
+
+# Testing
+
+def get_mse():
     pass
 
 
