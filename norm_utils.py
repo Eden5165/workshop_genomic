@@ -1,4 +1,6 @@
 import pandas as pd
+import numpy as np
+
 
 # Normalization
 def sum_gene_exp_to_num(genes_df, num):
@@ -17,8 +19,19 @@ def sum_gene_exp_to_num(genes_df, num):
     return genes_df_sum
 
 
-def gene_exp_log_trans(df):
-    pass
+def gene_exp_log_trans(genes_df, summed_to):
+    """
+    param genes_df: genes df such that rows are samples and first colum is the sample ID.
+    param summed_to: what number are the column in genes_df summed to. Can be 1 or 1000000.
+    return: If summed_to = 1: transform each value x in genes_df to log2(x + 10e-5). If summed
+    to = 1000000: x = log2(x + 10)
+    """
+    addition = 10
+    if summed_to == 1:
+        addition = pow(10, -5)
+    genes_transformed = genes_df.copy()
+    genes_transformed.iloc[:, 1:] = genes_transformed.iloc[:, 1:].transform(lambda x: x + addition).apply(np.log2)
+    return genes_transformed
 
 
 def ic50_log_trans(df):
