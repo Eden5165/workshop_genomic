@@ -143,8 +143,6 @@ def get_drug_clusters(df):
 
 
 # Task 2
-
-
 def predict_unlabeled(model1, unlabeled_df):
     pass
 
@@ -154,8 +152,13 @@ def predict_unlabeled_coreg(model1, unlabeled_df):
 
 
 # Testing
+def divide_to_folds(genes_df, drugs_df, division_df):
+    pass
 
 def get_mse():
+    pass
+
+def export_drugs_prediction(prediction_folds):
     pass
 
 
