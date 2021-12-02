@@ -1,5 +1,7 @@
 import pandas as pd
 import os
+from sklearn.metrics import mean_squared_error
+import data_prep_utils
 
 # Testing
 def divide_to_folds(genes_df, drugs_df):
@@ -19,8 +21,14 @@ def divide_to_folds(genes_df, drugs_df):
     return genes_folds, drugs_folds
 
 
-def get_mse():
-    pass
+def get_mse(true_drugs, pred_drugs):
+    """
+    param true_drugs: data frame of original drugs data such taht rows are drugs, values are
+    log transformed, no NaN values.
+    param pred_drugs: data frame of drugs prediction such that rows are drugs, values are
+    log transformed.
+    """
+    return mean_squared_error(true_drugs, pred_drugs)
 
 
 def export_drugs_prediction(drug_pred_df, file_name):
