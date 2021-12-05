@@ -38,4 +38,3 @@ def export_drugs_prediction(drug_pred_df, file_name):
     """
     output_fp = os.path.join(os.getcwd(), "prediction_results", file_name)
     drug_pred_df.to_csv(output_fp, sep="\t", line_terminator='\n', na_rep="NA", index_label=False)
-

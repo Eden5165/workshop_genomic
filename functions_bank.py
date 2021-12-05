@@ -160,6 +160,21 @@ def get_mse():
 def export_drugs_prediction(prediction_folds):
     pass
 
+# Task 3
+
+
+def build_cor_mat(drugs_df, muts_df):
+    pass
+
+def build_cor_mat_with_model_one(model1, tcga_genes, tcga_muts):
+    pass
+
+
+def build_cor_mat_with_model_two(model2, tcga_genes, tcga_muts):
+    pass
+
+
+
 
 
 
