@@ -41,3 +41,10 @@ def export_drugs_prediction(drug_pred_df, file_name):
     """
     output_fp = os.path.join(os.getcwd(), "prediction_results", file_name)
     drug_pred_df.to_csv(output_fp, sep="\t", line_terminator='\n', na_rep="NA", index_label=False)
+
+
+def merge_by_index(df1, df2):
+    """
+    get 2 data frames and return merge table by index
+    """
+    return  pd.merge(df1, df2, left_index=True, right_index=True)
