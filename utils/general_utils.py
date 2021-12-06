@@ -36,10 +36,10 @@ def get_mse(true_drugs, pred_drugs):
 
 def export_drugs_prediction(drug_pred_df, file_name):
     """
-    param pred_df: drug prediction df such that rows are samples.
+    param pred_df: drug prediction df such that rows are drugs.
     param file_name: the file name under which the df will be saved.
     """
-    output_fp = os.path.join(os.getcwd(), "prediction_results", file_name)
+    output_fp = os.path.join(os.path.dirname(os.getcwd()), "prediction_results", file_name)
     drug_pred_df.to_csv(output_fp, sep="\t", line_terminator='\n', na_rep="NA", index_label=False)
 
 
