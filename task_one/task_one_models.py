@@ -58,7 +58,7 @@ def get_reg_chain_model(train_x, train_y, reg_model='linear', order='random'):
     return RegressorChain(base_estimator=reg_models[reg_model], order=order).fit(train_x, train_y)
 
 
-def get_lasso_reg_model(train_x, train_y, alpha, normalize):
+def get_lasso_reg_model(train_x, train_y, alpha):
     """
     param tarin_x: genes train df such that rows are samples
     param train_y: drugs train df such that rows are samples, values are log transformed and no
@@ -67,11 +67,11 @@ def get_lasso_reg_model(train_x, train_y, alpha, normalize):
     param normalize: Should be False if the data is alreasy normalized or standartized.
     return: fitted model.
     """
-    return Lasso(alpha=alpha, fit_intercept=True, normalize=normalize, copy_X=True, selection="random").fit(train_x, train_y)
+    return Lasso(alpha=alpha, copy_X=True, selection="random").fit(train_x, train_y)
 
 def plot_kmeans_elbow(drugs_df, max_k=10):
     """
-    param drugs_df: drugs df such that drugs are rows, no missing values and values are log transformed.
+    param drugs_df: drugs df such that drugs are rows, no missing values and values are normed in some way.
     param max_k: int. max values of k to test.
     return: saving the elbow plot under kmeans_elbow
     """
@@ -79,11 +79,30 @@ def plot_kmeans_elbow(drugs_df, max_k=10):
     distortions = []
     for k in range(1, max_k):
         distortions.append(KMeans(n_clusters=k).fit(drugs_df).inertia_)
-    plt.plot(range(1, max_k), distortions)
+    plt.plot(range(1, max_k), distortions, 'bx-')
     plt.xlabel('k')
     plt.ylabel('Distotion')
     plt.title('Elbow Method for K-means algorithm on beat_drug')
     plt.savefig(plot_path)
+    plt.close()
+
+
+def split_drugs_by_kmeans(drugs_df, k=4):
+    """
+    param drugs_df: drugs df such that drugs are rows, no missing values and values are normed in some way.
+    param k: number of clusters. recommended for the beat_drugs data according to elbow method: 4.
+    return: drugs df splited to list of df according to k-means cluster division.
+    """
+    labels = KMeans(n_clusters=k).fit(drugs_df).labels_
+    drugs_clusters = drugs_df.copy()
+    drugs_clusters["cluster"] = labels
+    clusters = []
+    for label in range(k):
+        clusters.append(drugs_clusters[drugs_clusters["cluster"]==label].drop("cluster", axis=1))
+    # for cluster in clusters:
+    #     cluster.drop("cluster", inplace=True)
+    return clusters
+
 
 
     

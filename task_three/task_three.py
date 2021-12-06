@@ -1,6 +1,7 @@
 import pandas as pd
 from sklearn.svm import LinearSVC
 from sklearn.multioutput import MultiOutputClassifier
+from sklearn.ensemble import GradientBoostingClassifier
 
 
 def build_cor_mat(drugs_df, muts_df):
@@ -19,11 +20,20 @@ def build_cor_mat(drugs_df, muts_df):
     return pd.concat([drugs_ranked, muts_df], axis=1).corr()[drugs_ranked.columns].loc[muts_df.columns]
 
 
-def get_linear_svc_model(train_x, train_y):
+def get_linear_svc_class_model(train_x, train_y):
     """
     param x_train: genes df such that rows are samples and dimension is reduced to <= num of samples.
     param y_train: mutations df such that rows are samples.
     return: fitted model.
     """
     return MultiOutputClassifier(LinearSVC()).fit(train_x, train_y)
+
+
+def get_gradient_boosting_class_model(train_x, train_y):
+    """
+    param x_train: genes df such that rows are samples.
+    param y_train: mutations df such that rows are samples.
+    return: fitted model.
+    """
+    return MultiOutputClassifier(GradientBoostingClassifier()).fit(train_x, train_y)
 
