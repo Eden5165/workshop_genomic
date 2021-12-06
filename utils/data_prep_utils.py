@@ -8,14 +8,17 @@ from sklearn.impute import KNNImputer
 
 
 # Data preperation
-def get_df(table_name, sep='\t', lineterminator='\n'):
+def get_df(table_name, sep='\t', lineterminator='\n', nb=False):
     """
     param table_name: in ["beat_drug", "beat_rnaseq", "drug_mut_cor", "drug_mut_cor_lables", "tcga_mut", "tcga_rna"]
     param sep: Columns seperator characters. Optional, default='\t'
     param lineterminator: Rows seperator characters. Optional, default='\n'
     return: df for the requested table
     """
-    table_fp = os.path.join(os.path.dirname(os.getcwd()), "medical_genomics_2021_data", table_name)
+    parent_folder = os.getcwd()
+    if nb:
+        parent_folder = os.path.dirname(parent_folder)
+    table_fp = os.path.join(parent_folder, "medical_genomics_2021_data", table_name)
     return pd.read_csv(table_fp, sep=sep, lineterminator=lineterminator)
 
 

@@ -1,6 +1,7 @@
 import sys
 import os
 sys.path.append(os.path.dirname(os.getcwd()))
+sys.path.append(os.getcwd)
 
 import pandas as pd
 from sklearn.metrics import mean_squared_error
@@ -13,7 +14,7 @@ def divide_to_folds(genes_df, drugs_df):
     param drugs_df: drugs df such that rows are samples.
     return: tuple. array of genes df divided to the 5 folds, same with drugs.
     """
-    division_fp = os.path.join(os.getcwd(), "folds.txt")
+    division_fp = os.path.join(os.getcwd(), "medical_genomics_2021_data", "folds.txt")
     division_df = pd.read_csv(division_fp, sep='\t', lineterminator='\n', header=None, names=["sampleID", "fold"])
     genes_folds = []
     drugs_folds = []
