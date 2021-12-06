@@ -126,5 +126,6 @@ def norm_df(df, col=True):
         norm_df = transpose_df(norm_df)
     return norm_df
 
+
 def eliminate_extreme_vals(df):
     pass
