@@ -17,7 +17,7 @@ def pca(genes_df):
     print(X.shape)
 
     # Standardize - do we need it? -> check row/column standart
-    scaler =  StandardScaler()
+    scaler =  StandardScaler() 
     scaler.fit(X)
     X_scaled= scaler.transform(X)
 
@@ -27,7 +27,7 @@ def pca(genes_df):
     X_pca = pca.transform(X_scaled)
 
     print(X_pca.shape)
-    return X_pca
+    return pca, X_pca
 
 
 
