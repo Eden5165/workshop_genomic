@@ -4,6 +4,9 @@ from sklearn.ensemble import GradientBoostingRegressor
 from sklearn.multioutput import MultiOutputRegressor
 from sklearn.multioutput import RegressorChain
 from sklearn.tree import DecisionTreeRegressor
+from sklearn.cluster import KMeans
+import matplotlib.pyplot as plt
+import os
 
 
 def get_linear_reg_model(train_x, train_y):
@@ -66,10 +69,21 @@ def get_lasso_reg_model(train_x, train_y, alpha, normalize):
     """
     return Lasso(alpha=alpha, fit_intercept=True, normalize=normalize, copy_X=True, selection="random").fit(train_x, train_y)
 
-def plot_kmeans_elbow(drugs_df, plot_output):
+def plot_kmeans_elbow(drugs_df, max_k=10):
     """
     param drugs_df: drugs df such that drugs are rows, no missing values and values are log transformed.
-    return: 
+    param max_k: int. max values of k to test.
+    return: saving the elbow plot under kmeans_elbow
     """
+    plot_path = os.path.join(os.path.dirname(os.getcwd()), "plots", ("kmeans_elbow" + str(max_k)))
+    distortions = []
+    for k in range(1, max_k):
+        distortions.append(KMeans(n_clusters=k).fit(drugs_df).inertia_)
+    plt.plot(range(1, max_k), distortions)
+    plt.xlabel('k')
+    plt.ylabel('Distotion')
+    plt.title('Elbow Method for K-means algorithm on beat_drug')
+    plt.savefig(plot_path)
 
 
+    

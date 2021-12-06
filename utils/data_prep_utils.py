@@ -13,12 +13,12 @@ def get_df(table_name, sep='\t', lineterminator='\n'):
     return pd.read_csv(table_fp, sep=sep, lineterminator=lineterminator)
 
 
-def filter_beat_by_tcga(beat_rna, tcga_rna):
+def filter_beat_and_tcga_by_shared_genes(beat_rna, tcga_rna):
     """
     param beat_rna tcga_rna: original data frames such that rows are genes
-    return beat_rna_filtered: beat_rna df only with genes that appear in tcga_rna
+    return: beat_rna df  and tcga rna df only with genes that appear in both dfs
     """
-    return beat_rna[beat_rna.index.isin(tcga_rna.index)]
+    return beat_rna[beat_rna.index.isin(tcga_rna.index)], tcga_rna[tcga_rna.index.isin(beat_rna.index)]
 
 
 def transpose_df(df):
