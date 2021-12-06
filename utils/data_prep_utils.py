@@ -1,5 +1,11 @@
 import os
 import pandas as pd
+import numpy as np
+import math
+from sklearn.preprocessing import StandardScaler
+from sklearn.impute import KNNImputer
+
+
 
 # Data preperation
 def get_df(table_name, sep='\t', lineterminator='\n'):
@@ -28,6 +34,7 @@ def transpose_df(df):
     """
     return df.transpose()
 
+
 def get_data_reorgenized(genes_df, other_data_df):
     """
     param genes_df: genes df such that rows are samples
@@ -41,3 +48,83 @@ def get_data_reorgenized(genes_df, other_data_df):
     data_reorg = merged.iloc[:, list(range(first_other_field, last_other_field))]
     return data_reorg
 
+
+# Missing values
+def missing_vals_reg(drugs_df):
+    """
+
+    """
+    pass
+
+
+def missing_vals_knn(drugs_df, k=5):
+    """
+    param drugs_df: drugs df as returned from data_prep_utils.get_df. That means, rows are drugs.
+    param k: number of neighbors with which to run the KNN algorithm.
+    return: drugs_full with missing values filled using the KNN algorithm.
+    """
+    drugs_full = drugs_df.copy()
+    imputer = KNNImputer(n_neighbors=k)
+    drugs_full.iloc[:, :] = imputer.fit_transform(drugs_full)
+    return drugs_full
+    
+
+def missing_vals_method(drugs_df, method):
+    """
+    param drugs_df: drugs df transposed. That means, rows are samples.
+    param method: In: ["max", "mean"] A mathematical method to fill the missing values be.
+    return: NaN values filled by requested method, per drug.
+    """
+    values = {
+        "max": drugs_df.max,
+        "mean": drugs_df.mean
+    }
+    return drugs_df.fillna(value=values[method]().to_dict())
+
+# Normalization
+def sum_gene_exp_to_num_per_sample(genes_df, num):
+    pass
+
+
+def gene_exp_log_trans(genes_df, summed_to=1000000):
+    """
+    param genes_df: genes df, trasposed or not.
+    param summed_to: what number are the column in genes_df summed to. Can be 1 or 1000000.
+    return: If summed_to = 1: transform each value x in genes_df to log2(x + 10e-5). If summed
+    to = 1000000: x = log2(x + 10)
+    """
+    addition = 10
+    if summed_to == 1:
+        addition = pow(10, -5)
+    return genes_df.transform(lambda x: x + addition).apply(np.log2)
+
+
+def ic50_log_trans(drugs_df):
+    """
+    param genes_df: genes df, trasposed or not.
+    Will fill NA values with max value = 10, not recommenced, please fill NA values as wanted in advance.
+    return: Transform each value x to log10(x).
+    """
+    return drugs_df.fillna(10.0).apply(np.log10)
+
+
+def norm_df(df, col=True):
+    """
+    Param df: df for normalization
+    Param col: bool, if norm by column True, by row False
+    return norm_df: same df after normalization
+    """
+    col_keys, index_keys = df.columns, df.index
+    if not col:
+        df = transpose_df(df)
+        col_keys, index_keys = index_keys, col_keys
+    scaler = StandardScaler()
+    scaler.fit(df)
+    df_norm_ndarray = scaler.transform(df)
+    norm_df = pd.DataFrame(df_norm_ndarray,columns=col_keys, index=index_keys)
+    if not col:
+        norm_df = transpose_df(norm_df)
+    return norm_df
+
+def eliminate_extreme_vals(df):
+    pass
