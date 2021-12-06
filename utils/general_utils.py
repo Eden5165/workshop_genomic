@@ -1,7 +1,10 @@
-import pandas as pd
+import sys
 import os
+sys.path.append(os.path.dirname(os.getcwd()))
+
+import pandas as pd
 from sklearn.metrics import mean_squared_error
-import data_prep_utils
+from utils import data_prep_utils
 
 # Testing
 def divide_to_folds(genes_df, drugs_df):

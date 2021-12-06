@@ -1,10 +1,12 @@
-import data_prep_utils
-import norm_utils
-import missing_vals_utils
+import sys
+import os
+sys.path.append(os.path.dirname(os.getcwd()))
+
+from utils import data_prep_utils, norm_utils, missing_vals_utils
 import task_one_models
 
 # Piplines.
-# All pipelines will returl a tuple of three elements.
+# All pipelines will return a tuple of three elements.
 # First element will always be a fitted model to predict with.
 # If a pipeline uses feature selection, second element returned will be the list of features selected, else None.
 # If a pipelines uses dimension reduction, third element returned will be the fitted dr model to transform with, else None.
@@ -15,7 +17,8 @@ def pipeline_1(beat_rnaseq_train, beat_drug_train):
 def get_drug_prediction_df(pipeline, genes_folds, drugs_folds):
     predictions = []
     for i in range(5):
-        genes_test, drugs_test = genes_folds[i], drugs_folds[i]
+        # define 
+        pass
 
 
 def get_drugs(beat_rnaseq, beat_drug):

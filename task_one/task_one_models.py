@@ -66,7 +66,10 @@ def get_lasso_reg_model(train_x, train_y, alpha, normalize):
     """
     return Lasso(alpha=alpha, fit_intercept=True, normalize=normalize, copy_X=True, selection="random").fit(train_x, train_y)
 
-
-
+def plot_kmeans_elbow(drugs_df, plot_output):
+    """
+    param drugs_df: drugs df such that drugs are rows, no missing values and values are log transformed.
+    return: 
+    """
 
 

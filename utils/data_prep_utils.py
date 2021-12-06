@@ -9,7 +9,7 @@ def get_df(table_name, sep='\t', lineterminator='\n'):
     param lineterminator: Rows seperator characters. Optional, default='\n'
     return: df for the requested table
     """
-    table_fp = os.path.join(os.getcwd(), "medical_genomics_2021_data", table_name)
+    table_fp = os.path.join(os.path.dirname(os.getcwd()), "medical_genomics_2021_data", table_name)
     return pd.read_csv(table_fp, sep=sep, lineterminator=lineterminator)
 
 
