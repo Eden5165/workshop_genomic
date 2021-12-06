@@ -67,3 +67,6 @@ def get_lasso_reg_model(train_x, train_y, alpha, normalize):
     return Lasso(alpha=alpha, fit_intercept=True, normalize=normalize, copy_X=True, selection="random").fit(train_x, train_y)
 
 
+
+
+
