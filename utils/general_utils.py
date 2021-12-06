@@ -43,9 +43,17 @@ def export_drugs_prediction(drug_pred_df, file_name):
     output_fp = os.path.join(os.path.dirname(os.getcwd()), "prediction_results", file_name)
     drug_pred_df.to_csv(output_fp, sep="\t", line_terminator='\n', na_rep="NA", index_label=False)
 
-
+#utils
 def merge_by_index(df1, df2):
     """
     get 2 data frames and return merge table by index
     """
     return  pd.merge(df1, df2, left_index=True, right_index=True)
+
+def convert_predict_to_df(prediction, col_names, row_names):
+    """
+    param prediction: result from model prediction
+    param col_names: list of the predicted values names, for examples drugs names list
+    param row_names: list of samples indexes/names, for examples sample num
+    """
+    return pd.DataFrame(prediction,columns=col_names, index=row_names)
