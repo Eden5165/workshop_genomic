@@ -71,14 +71,15 @@ def get_lasso_reg_model(train_x, train_y, alpha):
 
 def plot_kmeans_elbow(drugs_df, max_k=10):
     """
-    param drugs_df: drugs df such that drugs are rows, no missing values and values are normed in some way.
+    param drugs_df: drugs df such that rows are samples, no missing values and values are normed in some way.
     param max_k: int. max values of k to test.
     return: saving the elbow plot under kmeans_elbow
     """
+    drugs_t = drugs_df.transpose()
     plot_path = os.path.join(os.path.dirname(os.getcwd()), "plots", ("kmeans_elbow" + str(max_k)))
     distortions = []
     for k in range(1, max_k):
-        distortions.append(KMeans(n_clusters=k).fit(drugs_df).inertia_)
+        distortions.append(KMeans(n_clusters=k).fit(drugs_t).inertia_)
     plt.plot(range(1, max_k), distortions, 'bx-')
     plt.xlabel('k')
     plt.ylabel('Distotion')
@@ -89,16 +90,16 @@ def plot_kmeans_elbow(drugs_df, max_k=10):
 
 def split_drugs_by_kmeans(drugs_df, k=4):
     """
-    param drugs_df: drugs df such that drugs are rows, no missing values and values are normed in some way.
+    param drugs_df: drugs df such that rows are samples, no missing values and values are normed in some way.
     param k: number of clusters. recommended for the beat_drugs data according to elbow method: 4.
     return: drugs df splited to list of df according to k-means cluster division.
     """
-    labels = KMeans(n_clusters=k).fit(drugs_df).labels_
-    drugs_clusters = drugs_df.copy()
-    drugs_clusters["cluster"] = labels
+    drugs_t = drugs_df.transpose()
+    labels = KMeans(n_clusters=k).fit(drugs_t).labels_
+    drugs_t["cluster"] = labels
     clusters = []
     for label in range(k):
-        clusters.append(drugs_clusters[drugs_clusters["cluster"]==label].drop("cluster", axis=1))
+        clusters.append(drugs_t[drugs_t["cluster"]==label].drop("cluster", axis=1).transpose())
     # for cluster in clusters:
     #     cluster.drop("cluster", inplace=True)
     return clusters

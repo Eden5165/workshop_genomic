@@ -28,21 +28,21 @@ def divide_to_folds(genes_df, drugs_df):
 
 def get_mse(true_drugs, pred_drugs):
     """
-    param true_drugs: data frame of original drugs data such taht rows are drugs, values are
+    param true_drugs: data frame of original drugs data such taht rows are samples, values are
     log transformed, no NaN values.
-    param pred_drugs: data frame of drugs prediction such that rows are drugs, values are
+    param pred_drugs: data frame of drugs prediction such that rows are samples, values are
     log transformed.
     """
-    return mean_squared_error(true_drugs, pred_drugs)
+    return mean_squared_error(true_drugs.transpose(), pred_drugs.transpose())
 
 
 def export_drugs_prediction(drug_pred_df, file_name):
     """
-    param pred_df: drug prediction df such that rows are drugs.
+    param pred_df: drug prediction df such that rows are samples.
     param file_name: the file name under which the df will be saved.
     """
     output_fp = os.path.join(os.getcwd(), "prediction_results", file_name)
-    drug_pred_df.to_csv(output_fp, sep="\t", line_terminator='\n', na_rep="NA", index_label=False)
+    drug_pred_df.transpose().to_csv(output_fp, sep="\t", line_terminator='\n', na_rep="NA", index_label=False)
 
 #utils
 def merge_by_index(df1, df2):

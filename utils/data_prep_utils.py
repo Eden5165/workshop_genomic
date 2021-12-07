@@ -1,7 +1,6 @@
 import os
 import pandas as pd
 import numpy as np
-import math
 from sklearn.preprocessing import StandardScaler
 from sklearn.impute import KNNImputer
 
@@ -13,29 +12,23 @@ def get_df(table_name, sep='\t', lineterminator='\n', nb=False):
     param table_name: in ["beat_drug", "beat_rnaseq", "drug_mut_cor", "drug_mut_cor_lables", "tcga_mut", "tcga_rna"]
     param sep: Columns seperator characters. Optional, default='\t'
     param lineterminator: Rows seperator characters. Optional, default='\n'
-    return: df for the requested table
+    return: df for the requested table such that rows are samples.
     """
     parent_folder = os.getcwd()
     if nb:
         parent_folder = os.path.dirname(parent_folder)
     table_fp = os.path.join(parent_folder, "medical_genomics_2021_data", table_name)
-    return pd.read_csv(table_fp, sep=sep, lineterminator=lineterminator)
+    return pd.read_csv(table_fp, sep=sep, lineterminator=lineterminator).transpose()
 
 
 def filter_beat_and_tcga_by_shared_genes(beat_rna, tcga_rna):
     """
-    param beat_rna tcga_rna: original data frames such that rows are genes
+    param beat_rna tcga_rna: dfs such that rows are samples.
     return: beat_rna df  and tcga rna df only with genes that appear in both dfs
     """
-    return beat_rna[beat_rna.index.isin(tcga_rna.index)], tcga_rna[tcga_rna.index.isin(beat_rna.index)]
-
-
-def transpose_df(df):
-    """
-    param df: df in wich columns are samples
-    return: trsanposed df such that first column named SampleID, rows are samples
-    """
-    return df.transpose()
+    beat_rna_raw = beat_rna.transpose()
+    tcga_rna_raw = tcga_rna.transpose()
+    return beat_rna_raw[beat_rna_raw.index.isin(tcga_rna_raw.index)].transpose(), tcga_rna_raw[tcga_rna_raw.index.isin(beat_rna_raw.index)].transpose()
 
 
 def get_data_reorgenized(genes_df, other_data_df):
@@ -53,23 +46,16 @@ def get_data_reorgenized(genes_df, other_data_df):
 
 
 # Missing values
-def missing_vals_reg(drugs_df):
-    """
-
-    """
-    pass
-
-
 def missing_vals_knn(drugs_df, k=5):
     """
-    param drugs_df: drugs df as returned from data_prep_utils.get_df. That means, rows are drugs.
+    param drugs_df: drugs df as such that rows are samples.
     param k: number of neighbors with which to run the KNN algorithm.
     return: drugs_full with missing values filled using the KNN algorithm.
     """
-    drugs_full = drugs_df.copy()
+    drugs_full_t = drugs_df.transpose()
     imputer = KNNImputer(n_neighbors=k)
-    drugs_full.iloc[:, :] = imputer.fit_transform(drugs_full)
-    return drugs_full
+    drugs_full_t.iloc[:, :] = imputer.fit_transform(drugs_full_t)
+    return drugs_full_t.transpose()
     
 
 def missing_vals_method(drugs_df, method):
@@ -84,11 +70,8 @@ def missing_vals_method(drugs_df, method):
     }
     return drugs_df.fillna(value=values[method]().to_dict())
 
+
 # Normalization
-def sum_gene_exp_to_num_per_sample(genes_df, num):
-    pass
-
-
 def gene_exp_log_trans(genes_df, summed_to=1000000):
     """
     param genes_df: genes df, trasposed or not.
@@ -119,14 +102,14 @@ def norm_df(df, col=True):
     """
     col_keys, index_keys = df.columns, df.index
     if not col:
-        df = transpose_df(df)
+        df = df.transpose()
         col_keys, index_keys = index_keys, col_keys
     scaler = StandardScaler()
     scaler.fit(df)
     df_norm_ndarray = scaler.transform(df)
-    norm_df = pd.DataFrame(df_norm_ndarray,columns=col_keys, index=index_keys)
+    norm_df = pd.DataFrame(df_norm_ndarray, columns=col_keys, index=index_keys)
     if not col:
-        norm_df = transpose_df(norm_df)
+        norm_df = norm_df.transpose()
     return norm_df
 
 
