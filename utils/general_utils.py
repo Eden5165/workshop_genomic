@@ -4,6 +4,7 @@ sys.path.append(os.path.dirname(os.getcwd()))
 sys.path.append(os.getcwd)
 
 import pandas as pd
+import numpy as np
 import matplotlib.pyplot as plt
 
 from sklearn import svm, datasets
@@ -66,7 +67,6 @@ def convert_predict_to_df(prediction, col_names, row_names):
     param row_names: list of samples indexes/names, for examples sample num
     """
     return pd.DataFrame(prediction,columns=col_names, index=row_names)
-
 
 def classifier_cross_validation(classifier, X, y):
     # Run classifier with cross-validation and plot ROC curves

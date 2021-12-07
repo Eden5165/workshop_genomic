@@ -61,31 +61,23 @@ def get_knn_model(train_x, train_y, k=5):
     return KNeighborsClassifier(n_neighbors = k, metric = 'minkowski', p = 2).fit(train_x, train_y)
 
 
-def load_df():
-    tcga_genes = data_prep_utils.gene_exp_log_trans(data_prep_utils.get_df("tcga_rna"))
-    beat_rnaseq = data_prep_utils.gene_exp_log_trans(data_prep_utils.get_df("beat_rnaseq"))
-    tcga_muts = data_prep_utils.get_df("tcga_mut")
-    beat_drug = data_prep_utils.ic50_log_trans(data_prep_utils.get_data_reorgenized(beat_rnaseq, data_prep_utils.missing_vals_knn(data_prep_utils.get_df("beat_drug"))))
+def load_df(nb = False):
+    tcga_genes = data_prep_utils.gene_exp_log_trans(data_prep_utils.get_df("tcga_rna",nb=nb))
+    beat_rnaseq = data_prep_utils.gene_exp_log_trans(data_prep_utils.get_df("beat_rnaseq",nb=nb))
+    tcga_muts = data_prep_utils.get_df("tcga_mut", nb=nb)
+    beat_drug = data_prep_utils.ic50_log_trans(data_prep_utils.get_data_reorgenized(beat_rnaseq, data_prep_utils.missing_vals_knn(data_prep_utils.get_df("beat_drug",nb=nb))))
     beat_rnaseq_shared, tcga_rna_shared = data_prep_utils.filter_beat_and_tcga_by_shared_genes(beat_rnaseq, tcga_genes)
     return tcga_rna_shared, tcga_muts, beat_rnaseq_shared, beat_drug
 
 
-def filter_samples(beat_rnaseq):
+def filter_samples(beat_rnaseq, drugs):
     samples_path = os.path.join(os.getcwd(), "medical_genomics_2021_data", "drug_mut_cor_labels")
     with open(samples_path, 'r') as fd:
         lines = fd.read().split('\n')
-    return beat_rnaseq.loc[beat_rnaseq.index.isin(lines), :]
+    return beat_rnaseq.loc[beat_rnaseq.index.isin(lines), :], drugs.loc[beat_rnaseq.index.isin(lines), :]
 
 
-def get_mut_predict():
-    tcga_genes, tcga_muts, beat_rnaseq_shared, beat_drug = load_df()
-    tcga_muts_int = data_prep_utils.mut_df_label_to_int(tcga_muts)
-
-    # tcga_genes_filtered, filtered_genes = feature_selection_utils.select_features_by_corrlation(tcga_genes, tcga_muts_int)
-    # beat_rnaseq_filterd = beat_rnaseq_shared.loc[:, ~(beat_rnaseq_shared.columns.isin(filtered_genes))]
-    
-    beat_rnaseq_shared = filter_samples(beat_rnaseq_shared)
-
+def get_mut_predict(tcga_genes, tcga_muts, beat_rnaseq_shared):
     scaler = StandardScaler()
     scaler.fit(tcga_genes)
     tcga_genes_norm = scaler.transform(tcga_genes)
@@ -103,10 +95,38 @@ def get_mut_predict():
     return mut_predict
 
 
+def mut_predict_by_one(tcga_genes, tcga_muts, beat_rnaseq_shared, beat_drug):
+    
+    scaler = StandardScaler()
+    scaler.fit(tcga_genes)
+    tcga_genes_norm = scaler.transform(tcga_genes)
+    beat_rnaseq_norm = scaler.transform(beat_rnaseq_shared)
+
+    vt = VarianceThreshold(0.05)
+    vt.fit(tcga_genes_norm)
+    filtered_genes_df = vt.transform(tcga_genes_norm)
+    filtered_beat_rnaseq_df = vt.transform(beat_rnaseq_norm)
+
+    predict_mut_list = {}
+
+    for mut_num, mut in enumerate(tcga_muts.colunms):
+        print(mut)
+        model = GradientBoostingClassifier()
+        mut_df = tcga_muts.iloc[:, mut_num:mut_num+1]
+        model.train(filtered_genes_df,mut_df)
+        mut_df_predict = model.predict(filtered_beat_rnaseq_df)
+        predict_mut_list[mut] = mut_df_predict
+    
+    return predict_mut_list
+    
+
+
 if __name__== "__main__" :
     tcga_genes, tcga_muts, beat_rnaseq_shared, beat_drug = load_df()
-    mut_predict = get_mut_predict()
-    mut_drug_df = get_mut_predict(beat_drug, mut_predict)
+    beat_rnaseq_shared_filterd, drugs_filtered = filter_samples(beat_rnaseq_shared, beat_drug)
+    mut_predict= get_mut_predict(tcga_genes, tcga_muts, beat_rnaseq_shared_filterd)
+    print(mut_predict)
+    mut_drug_df = build_cor_mat(drugs_filtered, general_utils.convert_predict_to_df(mut_predict, tcga_muts.columns, beat_rnaseq_shared.index))
     print(mut_drug_df)
 
     output_fp = os.path.join(os.getcwd(), "mut_drug_results", "1")
