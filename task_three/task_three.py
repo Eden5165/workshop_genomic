@@ -125,8 +125,12 @@ if __name__== "__main__" :
     tcga_genes, tcga_muts, beat_rnaseq_shared, beat_drug = load_df()
     beat_rnaseq_shared_filterd, drugs_filtered = filter_samples(beat_rnaseq_shared, beat_drug)
     mut_predict= get_mut_predict(tcga_genes, tcga_muts, beat_rnaseq_shared_filterd)
+
     print(mut_predict)
-    mut_drug_df = build_cor_mat(drugs_filtered, general_utils.convert_predict_to_df(mut_predict, tcga_muts.columns, beat_rnaseq_shared.index))
+    output_fp = os.path.join(os.getcwd(), "mut_predict", "0000")
+    mut_predict.transpose().to_csv(output_fp, sep="\t", line_terminator='\n', na_rep="NA", index_label=False)
+
+    mut_drug_df = build_cor_mat(drugs_filtered, general_utils.convert_predict_to_df(mut_predict, tcga_muts.columns, beat_rnaseq_shared_filterd.index))
     print(mut_drug_df)
 
     output_fp = os.path.join(os.getcwd(), "mut_drug_results", "1")
