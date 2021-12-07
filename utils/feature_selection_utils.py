@@ -120,3 +120,57 @@ def select_high_var_genes(genes_df):
     filtered_genes_df = genes_df.loc[:, mask]
     print(filtered_genes_df.shape) # TODO: delete
     return filtered_genes_df
+
+
+def find_corr_by_y(features_df, predict_column, predict):
+    """
+    find drug corrletion betwwn each drug to all the genes
+    param gene_df: gene table df (only gene with small corrleation to all the drugs that tested until now)
+    param drug_coulmn: get the drug relevant data
+    param draw: bool
+    return gene_df_filtered: the gene_df after filtering 
+    return low_corr_genes: list of the low corrlation genes
+    """
+    features_list = features_df.columns
+    low_corr_genes = []
+    full_table = pd.merge(predict_column,  features_df,left_index=True, right_index=True)
+
+    for featrue_idx, feature in enumerate(features_list):
+        corr_data = full_table.iloc[:, [0, featrue_idx+1]].corr()
+        corr = abs(corr_data.values[0,1])
+        if corr < 0.3 :
+            low_corr_genes.append(feature)
+
+    gene_df_filtered = features_df.loc[:, low_corr_genes]
+
+    return gene_df_filtered, low_corr_genes
+
+def select_features_by_corrlation(features_df, result_df):
+    """
+    filtered out all the genes that don't corllate with any of the drugs
+
+    note: run only for genes with low corrlation for all the other drugs(that tested before the tested drug) 
+
+    :param gene_df, drug_df (both df after the preperation)
+    :return: 
+        genes_to_filter: list of all the genes the function filtered out
+        filtered_gene_df: gene df after filter
+    """
+    my_features_df = features_df
+    features_to_filter = features_df.columns
+    counter = 1
+    for predict_num,predict in enumerate(result_df.columns): 
+
+        my_features_df = my_features_df.loc[:, (my_features_df.columns.isin(features_to_filter))]
+
+        predict_col = result_df.iloc[:,predict_num:predict_num+1]
+
+        my_features_df, features_to_filter = find_corr_by_y(my_features_df, predict_col, predict)
+
+        print(counter, " - ",predict, " -> ", len(features_to_filter))
+
+        counter += 1
+    
+    
+    new_genes_df = features_df.loc[:, ~(features_df.columns.isin(features_to_filter))]
+    return new_genes_df, features_to_filter
