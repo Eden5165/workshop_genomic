@@ -1,7 +1,13 @@
 import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt
 from sklearn.svm import LinearSVC
 from sklearn.multioutput import MultiOutputClassifier
 from sklearn.ensemble import GradientBoostingClassifier
+from sklearn.neighbors import KNeighborsClassifier
+
+
+import sklearn
 
 
 def build_cor_mat(drugs_df, muts_df):
@@ -37,3 +43,13 @@ def get_gradient_boosting_class_model(train_x, train_y):
     """
     return MultiOutputClassifier(GradientBoostingClassifier()).fit(train_x, train_y)
 
+
+def get_knn_model(train_x, train_y, k=5):
+    """
+    model demands: 
+     * features selection + dimentions reductions
+     * normlizing
+     * k value (neighbors num)
+     * p could be 1,2, infinity , each one represent a norm
+    """
+    return KNeighborsClassifier(n_neighbors = k, metric = 'minkowski', p = 2).fit(train_x, train_y)

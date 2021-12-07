@@ -45,6 +45,12 @@ def get_data_reorgenized(genes_df, other_data_df):
     return data_reorg
 
 
+def mut_df_label_to_int(tgca_mut_df):
+    """
+    change mut df to show 0/1 instead of False/True 
+    """
+    return tgca_mut_df*1
+
 # Missing values
 def missing_vals_knn(drugs_df, k=5):
     """
