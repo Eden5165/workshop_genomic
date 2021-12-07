@@ -4,7 +4,6 @@ sys.path.append(os.path.dirname(os.getcwd()))
 sys.path.append(os.getcwd())
 
 from utils import data_prep_utils, general_utils
-import task_one_models
 import pandas as pd
 import matplotlib.pyplot as plt
 import numpy as np

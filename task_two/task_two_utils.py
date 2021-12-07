@@ -1,6 +1,13 @@
+import sys
+import os
+sys.path.append(os.path.dirname(os.getcwd()))
+sys.path.append(os.getcwd())
+
+from utils import data_prep_utils, general_utils
 import pandas as pd
+import matplotlib.pyplot as plt
 import numpy as np
-from utils import general_utils, data_prep_utils
+from task_one.task_one_pipelines import PIPLINES
 
 def coreg_algo(beat_rna_df, tcga_rna_df, drug_df):
     """
@@ -64,5 +71,29 @@ def get_drug_prediction_df_task_2(pipeline, genes_folds, drugs_folds, pipeline_i
         predictions.append(general_utils.convert_predict_to_df(prediction, test_y.columns, test_y.index))
 
     drug_pred_df = pd.concat(predictions)  
-    general_utils.export_drugs_prediction(drug_pred_df, "task_one_pipeline_" + str(pipeline_idx))
+    general_utils.export_drugs_prediction(drug_pred_df, "task_two_pipeline_" + str(pipeline_idx))
     return drug_pred_df
+
+def main():
+    print("load data\n")
+    beat_rnaseq = data_prep_utils.gene_exp_log_trans(data_prep_utils.get_df("beat_rnaseq"))
+    tcga_rna =  data_prep_utils.gene_exp_log_trans(data_prep_utils.get_df("tcga_rna"))
+    beat_drug_df = data_prep_utils.ic50_log_trans(data_prep_utils.get_data_reorgenized(beat_rnaseq, data_prep_utils.missing_vals_knn(data_prep_utils.get_df("beat_drug"))))
+    beat_rnaseq_shared, tcga_rna_shared = data_prep_utils.filter_beat_and_tcga_by_shared_genes(beat_rnaseq, tcga_rna)
+    
+    print("predict tcga")
+    pipeline = PIPLINES["lasso_best_alpha"]
+    tcga_predic_drug = predict_tcga_by_pipline(beat_rnaseq_shared, tcga_rna_shared, beat_drug_df, pipeline) 
+    
+    print("predict drugs")
+    genes_folds, drugs_folds = general_utils.divide_to_folds([beat_rnaseq_shared, beat_drug_df])  
+
+    pred = get_drug_prediction_df_task_2(pipeline, genes_folds, drugs_folds, 1, tcga_rna_shared,tcga_predic_drug)
+
+    print(general_utils.get_mse(beat_drug_df, pred))
+    
+
+    return pred
+
+if __name__== "__main__" :
+    main()

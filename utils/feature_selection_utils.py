@@ -7,7 +7,7 @@ import pandas as pd
 
 ## https://machinelearningmastery.com/feature-selection-with-real-and-categorical-data/
 
-VT_THRESHOLD = 0.5 # cahnge after normalization
+VT_THRESHOLD = 0.05 # cahnge after normalization
 
 
 def feature_reduction_by_genes_with_genes_corr(gene_df):
@@ -168,7 +168,7 @@ def select_features_by_corrlation(features_df, result_df):
 
         my_features_df, features_to_filter = find_corr_by_y(my_features_df, predict_col, predict)
 
-        print(counter, " - ",predict, " -> ", len(features_to_filter))
+        # print(counter, " - ",predict, " -> ", len(features_to_filter))
 
         counter += 1
     
