@@ -8,22 +8,21 @@ from sklearn.metrics import mean_squared_error
 from utils import data_prep_utils
 
 # Testing
-def divide_to_folds(genes_df, drugs_df):
-    # ToDo: recive list of dfs
+def divide_to_folds(dfs):
     """
-    param genes_df: genes df such that rows are samples.
-    param drugs_df: drugs df such that rows are samples.
-    return: tuple. array of genes df divided to the 5 folds, same with drugs.
+    param dfs: a list of dfs to divide.
+    return: a list of splited dfs.
     """
     division_fp = os.path.join(os.getcwd(), "medical_genomics_2021_data", "folds.txt")
     division_df = pd.read_csv(division_fp, sep='\t', lineterminator='\n', header=None, names=["sampleID", "fold"])
-    genes_folds = []
-    drugs_folds = []
-    for i in range(1, 6):
-        samples = division_df[division_df["fold"]==i]["sampleID"]
-        genes_folds.append(genes_df[genes_df.index.isin(samples)])
-        drugs_folds.append(drugs_df[drugs_df.index.isin(samples)])
-    return genes_folds, drugs_folds
+    dfs_folds=[]
+    for df in dfs:
+        df_folds = []
+        for i in range(1, 6):
+            samples = division_df[division_df["fold"]==i]["sampleID"]
+            df_folds.append(df[df.index.isin(samples)])
+        dfs_folds.append(df_folds)
+    return dfs_folds
 
 
 def get_mse(true_drugs, pred_drugs):
