@@ -104,7 +104,7 @@ def select_gene_by_corrlation(genes_df, drug_df):
     
     
     new_genes_df = genes_df.loc[:, ~(genes_df.columns.isin(genes_to_filter))]
-    return new_genes_df
+    return new_genes_df, genes_to_filter
 
 def select_high_var_genes(genes_df): 
     """
