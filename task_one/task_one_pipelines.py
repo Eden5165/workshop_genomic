@@ -10,8 +10,10 @@ import matplotlib.pyplot as plt
 import numpy as np
 from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import StandardScaler
-from sklearn.linear_model import Lasso
+from sklearn.linear_model import Lasso, LinearRegression
 from sklearn.multioutput import MultiOutputRegressor
+from sklearn.feature_selection import VarianceThreshold
+from sklearn.multioutput import RegressorChain
 
 # Piplines.
 # All pipelines will return a tuple of three elements.
@@ -21,7 +23,7 @@ from sklearn.multioutput import MultiOutputRegressor
 
 
 PIPLINES = {
-    "lasso": [
+    "test_lasso": [
         Pipeline([('scaler', StandardScaler()), ('lasso', Lasso(random_state=10, max_iter=10000, alpha=0.1))]),
         Pipeline([('scaler', StandardScaler()),('lasso', Lasso(random_state=10, max_iter=10000, alpha=0.2))]),
         Pipeline([('scaler', StandardScaler()), ('lasso', Lasso(random_state=10, max_iter=10000, alpha=0.3))]),
@@ -32,7 +34,22 @@ PIPLINES = {
         Pipeline([('scaler', StandardScaler()), ('lasso', Lasso(random_state=10, max_iter=10000, alpha=0.8))]),
         Pipeline([('scaler', StandardScaler()), ('lasso', Lasso(random_state=10, max_iter=10000, alpha=0.9))]),
     ],
-    "lasso_best_alpha": Pipeline([('scaler', StandardScaler()), ('lasso', Lasso(random_state=10, max_iter=10000, alpha=0.8))])
+    "lasso_best_alpha": Pipeline([('scaler', StandardScaler()), ('lasso', Lasso(random_state=10, max_iter=10000, alpha=0.9))]),
+    "test_linear_reg_fs": [
+        Pipeline([('lr', LinearRegression())]),
+        Pipeline([('scaler', StandardScaler()), ('var_th', VarianceThreshold(threshold=(0))), ('lr', LinearRegression())]),
+        Pipeline([('scaler', StandardScaler()), ('var_th', VarianceThreshold(threshold=(0.1))), ('lr', LinearRegression())]),
+        Pipeline([('scaler', StandardScaler()), ('var_th', VarianceThreshold(threshold=(0.2))), ('lr', LinearRegression())]),
+        Pipeline([('scaler', StandardScaler()), ('var_th', VarianceThreshold(threshold=(0.3))), ('lr', LinearRegression())]),
+        Pipeline([('scaler', StandardScaler()), ('var_th', VarianceThreshold(threshold=(0.4))), ('lr', LinearRegression())]),
+        Pipeline([('scaler', StandardScaler()), ('var_th', VarianceThreshold(threshold=(0.5))), ('lr', LinearRegression())])
+    ],
+    "test_regressor_chain": [
+        Pipeline([('scaler', StandardScaler()), ('rc_lasso', RegressorChain(base_estimator=Lasso(random_state=10, max_iter=10000, alpha=0.9), order="random"))]),
+        Pipeline([('scaler', StandardScaler()), ('rc_lasso', RegressorChain(base_estimator=Lasso(random_state=10, max_iter=10000, alpha=0.9), order=None))])
+        ],
+    "lr_rc": Pipeline([('scaler', StandardScaler()), ('var_th', VarianceThreshold(threshold=(0.5))), ('rc_lr', RegressorChain(base_estimator=LinearRegression(), order="random"))])
+
 }
 
 
@@ -56,24 +73,23 @@ def get_drug_prediction_df(pipeline, genes_folds, drugs_folds, pipeline_idx):
     general_utils.export_drugs_prediction(drug_pred_df, "task_one_pipeline_" + str(pipeline_idx))
     return drug_pred_df
 
-def test_lasso_alphas(genes_folds, drugs_folds, beat_drug, missing_sys):
-    """
-    """
+
+def test_pipelines(pipelines, genes_folds, drugs_folds, beat_drug, missing_sys):
     mses = []
-    for idx, lasso_pipline in enumerate(PIPLINES["lasso"]):
-        print("Testing alpha:", "0." + str(idx + 1))
-        drug_pred_df = get_drug_prediction_df(lasso_pipline, genes_folds, drugs_folds, missing_sys + "_lasso_" + str(idx))
-        # print("+++++++++\n", drug_pred_df.head(), "\n\n", beat_drug_k.head())
+    print("Testing", pipelines)
+    for idx, pipline in enumerate(PIPLINES[pipelines]):
+        print("Testing pipeline:", str(idx + 1))
+        drug_pred_df = get_drug_prediction_df(pipline, genes_folds, drugs_folds, f"{missing_sys}_{pipelines}_{str(idx + 1)}")
         mses.append(general_utils.get_mse(beat_drug, drug_pred_df))
         print("mse:", mses[idx])
     return mses
 
-def plot_test_lasso_pipeline_alphas(alphas, mses):
-    plot_path = os.path.join(os.getcwd(), "plots", "test_lasso_alphas")
-    plt.plot(mses, alphas)
+def plot_test_pipelines(param_name, param_vals, mses, plot_name):
+    plot_path = os.path.join(os.getcwd(), "plots", plot_name)
+    plt.plot(mses, param_vals)
     plt.xlabel('MSE Scores')
-    plt.ylabel('Alpha Values')
-    plt.title('MSE Scores for Differens Alpha Values - Lasso Regressor')
+    plt.ylabel(f'{param_name} Values')
+    plt.title(f'MSE Scores for Differens {param_name} Values - Lasso Regressor')
     plt.savefig(plot_path)
     plt.close()
 
@@ -102,16 +118,31 @@ def main():
     genes_folds_filt = general_utils.divide_to_folds([beat_rnaseq_filt])[0]
     
     # alphas = list(np.arange(0.1, 1, 0.1))
-    # mses = test_lasso_alphas(genes_folds, drugs_folds_k, beat_drug_k)
+    # alphas_mses = test_pipelines("test_lasso", genes_folds, drugs_folds_k, beat_drug_k, "kmenas")
+    # print(alphas_mses)
+    # plot_test_pipelines("Alphas", alphas, alphas_mses, "test_lasso_alphas")
+    
+    # alphas = list(np.arange(0.1, 1, 0.1))
+    # mses = test_lasso_alphas(genes_folds_filt, drugs_folds_mean, beat_drug_mean, "mean")
     # print(mses)
     # plot_test_lasso_pipeline_alphas(alphas, mses)
 
-    # print("\n", beat_drug_mean.head())
-    
-    alphas = list(np.arange(0.1, 1, 0.1))
-    mses = test_lasso_alphas(genes_folds_filt, drugs_folds_mean, beat_drug_mean, "mean")
-    print(mses)
-    plot_test_lasso_pipeline_alphas(alphas, mses)
+    # thresholds = [-1] + list(np.arange(0.0, 0.6, 0.1))
+    # thresholds_mses = test_pipelines("test_linear_reg_fs", genes_folds, drugs_folds_k, beat_drug_k, "kmenas")
+    # print(thresholds_mses)
+    # plot_test_pipelines("Feature Selection Variance Threshold", thresholds, thresholds_mses, "test_lr_fs_th")
+
+    # orders = ["random", "ordered"]
+    # orders_mse = test_pipelines("test_regressor_chain", genes_folds, drugs_folds_k, beat_drug_k, "kmenas")
+    # print(orders_mse)
+    # plot_test_pipelines("Drugs Order", orders, orders_mse, "test_regressor_chain_orders")
+
+    lr_rc_pred = get_drug_prediction_df(PIPLINES['lr_rc'], genes_folds, drugs_folds_k, 0)
+    print(general_utils.get_mse(drugs_folds_k, lr_rc_pred))
+
+
+
+
 
 
 if __name__== "__main__" :
