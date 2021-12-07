@@ -33,7 +33,7 @@ def get_mse(true_drugs, pred_drugs):
     param pred_drugs: data frame of drugs prediction such that rows are samples, values are
     log transformed.
     """
-    return mean_squared_error(true_drugs.transpose(), pred_drugs.transpose())
+    return mean_squared_error(true_drugs, pred_drugs)
 
 
 def export_drugs_prediction(drug_pred_df, file_name):

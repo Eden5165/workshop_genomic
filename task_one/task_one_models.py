@@ -58,7 +58,7 @@ def get_reg_chain_model(train_x, train_y, reg_model='linear', order='random'):
     return RegressorChain(base_estimator=reg_models[reg_model], order=order).fit(train_x, train_y)
 
 
-def get_lasso_reg_model(train_x, train_y, alpha):
+def get_lasso_reg_model(alpha):
     """
     param tarin_x: genes train df such that rows are samples
     param train_y: drugs train df such that rows are samples, values are log transformed and no
@@ -67,7 +67,7 @@ def get_lasso_reg_model(train_x, train_y, alpha):
     param normalize: Should be False if the data is alreasy normalized or standartized.
     return: fitted model.
     """
-    return Lasso(alpha=alpha, copy_X=True, selection="random").fit(train_x, train_y)
+    return Lasso(alpha=alpha, copy_X=True, selection="random")
 
 def plot_kmeans_elbow(drugs_df, max_k=10):
     """
