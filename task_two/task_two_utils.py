@@ -1,6 +1,6 @@
 import pandas as pd
 import numpy as np
-from utils import general_utils
+from utils import general_utils, data_prep_utils
 
 def coreg_algo(beat_rna_df, tcga_rna_df, drug_df):
     """
@@ -21,7 +21,10 @@ def predict_tcga(beat_rna_df, tcga_rna_df, drug_df, pipeline_task_one):
         tcga_rna_ready_predict =  dimention_red_model.transform(tcga_after_filterd_features)
     else:
         tcga_rna_ready_predict = tcga_after_filterd_features
-    tcga_drug_predict = model_predictor.predict()
+    #for pipeline1-> FIXME: delete
+    tcga_rna_ready_predict = data_prep_utils.norm_df(tcga_rna_ready_predict)
+    tcga_drug_predict = model_predictor.predict(tcga_rna_ready_predict)
+    print(tcga_drug_predict)
     tcga_drug_predict_df = general_utils.convert_predict_to_df(tcga_drug_predict, drug_df.columns, tcga_rna_df.index)
 
     return tcga_drug_predict_df
