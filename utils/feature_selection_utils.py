@@ -10,7 +10,6 @@ import pandas as pd
 VT_THRESHOLD = 0.5 # cahnge after normalization
 
 
-
 def feature_reduction_by_genes_with_genes_corr(gene_df):
     """
     choose only genes with input, if there are 2 genes that bring the same input choose only one of them.
@@ -24,6 +23,7 @@ def feature_reduction_by_genes_with_genes_corr(gene_df):
     """
     pass
 
+
 def backward_elimination(model):
     """
     we feed all the possible features to the model at first. 
@@ -32,6 +32,7 @@ def backward_elimination(model):
     link: https://towardsdatascience.com/feature-selection-with-pandas-e3690ad8504b
     """
     pass
+
 
 def rfe_elimination(model, gene_df, drug_y):
 
@@ -56,7 +57,6 @@ def rfe_elimination(model, gene_df, drug_y):
     return genes_to_filter, filtered_gene_df
 
 
-
 def find_corr_by_drug(genes_df, drug_coulmn, drug_name):
     """
     find drug corrletion betwwn each drug to all the genes
@@ -79,6 +79,7 @@ def find_corr_by_drug(genes_df, drug_coulmn, drug_name):
 
     return gene_df_filtered, low_corr_genes
 
+
 def select_gene_by_corrlation(genes_df, drug_df):
     """
     filtered out all the genes that don't corllate with any of the drugs
@@ -99,12 +100,13 @@ def select_gene_by_corrlation(genes_df, drug_df):
 
         my_genes_df, genes_to_filter = find_corr_by_drug(my_genes_df, drug_df[drug], drug)
 
-        print(counter, " - ",drug, " -> ", len(genes_to_filter))
+        # print(counter, " - ",drug, " -> ", len(genes_to_filter))
         counter += 1
     
     
     new_genes_df = genes_df.loc[:, ~(genes_df.columns.isin(genes_to_filter))]
     return new_genes_df, genes_to_filter
+
 
 def select_high_var_genes(genes_df): 
     """
@@ -113,12 +115,10 @@ def select_high_var_genes(genes_df):
     param genes_df: genes dataframe *after normalizatiomn*
     return filtered_genes_df
     """
-    print(genes_df.shape) # TODO: delete
     vt = VarianceThreshold(VT_THRESHOLD)
     _ = vt.fit(genes_df)
     mask = vt.get_support()
     filtered_genes_df = genes_df.loc[:, mask]
-    print(filtered_genes_df.shape) # TODO: delete
     return filtered_genes_df
 
 
@@ -144,6 +144,7 @@ def find_corr_by_y(features_df, predict_column, predict):
     gene_df_filtered = features_df.loc[:, low_corr_genes]
 
     return gene_df_filtered, low_corr_genes
+
 
 def select_features_by_corrlation(features_df, result_df):
     """

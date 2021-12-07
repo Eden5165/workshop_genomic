@@ -39,3 +39,30 @@ def predict_tcga_by_pipline(beat_rna_df, tcga_rna_df, drug_df, pipeline_task_one
     tcga_drug_predict = pipeline_task_one.predict(tcga_rna_shared)
 
     return general_utils.convert_predict_to_df(tcga_drug_predict, drug_df.columns, tcga_rna_df.index)
+
+def get_drug_prediction_df_task_2(pipeline, genes_folds, drugs_folds, pipeline_idx, tcga_rna, tcga_predic_drug):
+    """
+    param pipeline: a pipeline function object.
+    param genes_folds: list of genes df divided by folds, row are samples.
+    param drugs_folds: same as genes_folds.
+    return: drugs prediction df such that samples are rows.
+    """
+    predictions = []
+    for i in range(5):
+        print("In fold number", i)
+
+        train_x_folds = pd.concat(genes_folds[:i] + genes_folds[i+1:])
+        train_x = pd.concat([train_x_folds, tcga_rna])
+
+        train_y_folds = pd.concat(drugs_folds[:i] + drugs_folds[i+1:])
+        train_y = pd.concat([train_y_folds, tcga_predic_drug])
+
+        test_x, test_y = genes_folds[i], drugs_folds[i]
+
+        pipeline.fit(train_x, train_y)
+        prediction = pipeline.predict(test_x)
+        predictions.append(general_utils.convert_predict_to_df(prediction, test_y.columns, test_y.index))
+
+    drug_pred_df = pd.concat(predictions)  
+    general_utils.export_drugs_prediction(drug_pred_df, "task_one_pipeline_" + str(pipeline_idx))
+    return drug_pred_df

@@ -8,12 +8,15 @@ from sklearn.metrics import mean_squared_error
 from utils import data_prep_utils
 
 # Testing
-def divide_to_folds(dfs):
+def divide_to_folds(dfs, nb =False):
     """
     param dfs: a list of dfs to divide.
     return: a list of splited dfs.
     """
-    division_fp = os.path.join(os.getcwd(), "medical_genomics_2021_data", "folds.txt")
+    parent_folder = os.getcwd()
+    if nb:
+        parent_folder = os.path.dirname(parent_folder)
+    division_fp = os.path.join(parent_folder, "medical_genomics_2021_data", "folds.txt")
     division_df = pd.read_csv(division_fp, sep='\t', lineterminator='\n', header=None, names=["sampleID", "fold"])
     dfs_folds=[]
     for df in dfs:

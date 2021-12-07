@@ -7,9 +7,6 @@ from sklearn.ensemble import GradientBoostingClassifier
 from sklearn.neighbors import KNeighborsClassifier
 
 
-import sklearn
-
-
 def build_cor_mat(drugs_df, muts_df):
     """
     param drugs_df: drugs df such that rows are samples and no missing values.

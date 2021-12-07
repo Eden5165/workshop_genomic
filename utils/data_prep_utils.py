@@ -5,7 +5,6 @@ from sklearn.preprocessing import StandardScaler
 from sklearn.impute import KNNImputer
 
 
-
 # Data preperation
 def get_df(table_name, sep='\t', lineterminator='\n', nb=False):
     """
