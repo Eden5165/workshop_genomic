@@ -66,7 +66,9 @@ def convert_predict_to_df(prediction, col_names, row_names):
     param col_names: list of the predicted values names, for examples drugs names list
     param row_names: list of samples indexes/names, for examples sample num
     """
-    return pd.DataFrame(prediction,columns=col_names, index=row_names)
+    df = pd.DataFrame(prediction,columns=col_names, index=row_names)
+    print("convert_predict_to_df-> null_count: ", df.isna().sum().sum())
+    return df
 
 def classifier_cross_validation(classifier, X, y):
     # Run classifier with cross-validation and plot ROC curves

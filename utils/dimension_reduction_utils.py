@@ -24,8 +24,10 @@ def pca_full_path(feature_df):
     new_feature_after_pca = pca.transform(feature_df_norm)
     return pca, new_feature_after_pca
 
+
 def get_pca_model(feature_df):
     return PCA(n_components=PRESERVE_COMP, random_state = 2020)
+
 
 def aml_genes_selection(df):
     # Select only genes associated with AML as features
@@ -37,3 +39,4 @@ def k_means_reduction(df):
     TODO: with huristic k
     """
     pass
+
